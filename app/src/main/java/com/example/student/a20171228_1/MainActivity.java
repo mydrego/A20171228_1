@@ -8,6 +8,9 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import org.json.JSONArray;
 
 import java.io.BufferedReader;
@@ -17,9 +20,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    JSONArray jsonArray;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,46 +29,45 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-       reLoad();
+        reLoad();
 
     }
 
-    public void reLoad (){
-        ArrayList<String> al = new ArrayList();
-        File myfile = new File(getFilesDir(), "myfile.txt");
-
+    public void reLoad() {
+        ArrayList<String> arrayList = new ArrayList();
+        File myfile2 = new File(getFilesDir(), "myfile2.txt");
+        String str = "";
 
         try {
-            FileReader fr = new FileReader(myfile);
-            BufferedReader br = new BufferedReader(fr);
-
-            String str;
-            while ((str = br.readLine()) != null) {
-                al.add(str);
-            }
-            br.close();
-            fr.close();
+            FileReader fileReader = new FileReader(myfile2);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            str = bufferedReader.readLine();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+        if (str.equals("")) {
+            arrayList = new ArrayList<String>();
+        } else {
+            Gson gson = new Gson();
+            arrayList = gson.fromJson(str, new TypeToken<ArrayList<String>>() {}.getType());
+        }
+
         ListView lv = (ListView) findViewById(R.id.listview);
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this,
-                android.R.layout.simple_list_item_1, al);
+                android.R.layout.simple_list_item_1, arrayList);
         lv.setAdapter(arrayAdapter);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.mmenu, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.mmadd)
-        {
+        if (item.getItemId() == R.id.mmadd) {
             Mydlog mydlog = new Mydlog();
             mydlog.show(getFragmentManager(), "Mydlog");
         }
